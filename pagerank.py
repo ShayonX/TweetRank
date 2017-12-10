@@ -2,7 +2,7 @@ import numpy as np
 from scipy.sparse import csc_matrix
 
 
-def pageRank(G, s=.85, maxerr=.0001):
+def pageRank(G, s=.85, maxerr=.0001, max_iterations=50):
     """
     Computes the pagerank for each of the n states
 
@@ -30,7 +30,10 @@ def pageRank(G, s=.85, maxerr=.0001):
 
     # Compute pagerank r until we converge
     ro, r = np.zeros(n), np.ones(n)
-    while np.sum(np.abs(r - ro)) > maxerr:
+    iteration = 1
+    err = 1
+    while err > maxerr:
+        print('Iteration %d...' % iteration)
         ro = r.copy()
         # calculate each pagerank at a time
         for i in xrange(0, n):
@@ -42,6 +45,11 @@ def pageRank(G, s=.85, maxerr=.0001):
             Ei = np.ones(n) / float(n)
 
             r[i] = ro.dot(Ai * s + Di * s + Ei * (1 - s))
+        err = np.sum(np.abs(r - ro))
+        print('Error %f' % err)
+        print('Iteration %d...done' % iteration)
+        iteration += 1
+        if iteration > max_iterations: break
 
     # return normalized pagerank
     return r / float(sum(r))
