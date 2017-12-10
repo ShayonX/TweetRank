@@ -51,7 +51,6 @@ if __name__ == '__main__':
 
         print('Processing tweets...done. %d found' % n)
         graph = pandas.DataFrame(index=tweet_ids, columns=tweet_ids, dtype=int)
-        print graph
         print('Building graph...')
         for tweet_id in tweet_ids:
             rts = users_rted.get(tweet_id, [])
