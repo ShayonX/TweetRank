@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import json
 import os
 from pprint import pprint
@@ -51,13 +53,14 @@ if __name__ == '__main__':
 
         print('Processing tweets...done. %d found' % n)
         graph = pandas.DataFrame(index=tweet_ids, columns=tweet_ids, dtype=int)
+
         print('Building graph...')
         for tweet_id in tweet_ids:
             rts = users_rted.get(tweet_id, [])
             for user in rts:
                 user_tweets = tweets_by_user.get(user, [])
                 for user_tweet in user_tweets:
-                    graph[tweet_id][user_tweet] = 1
+                    graph[user_tweet][tweet_id] = 1
         print('Building graph...done')
 
         print('Running TweetRank...')
