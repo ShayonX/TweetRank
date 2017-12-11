@@ -6,6 +6,7 @@ from pprint import pprint
 
 import pandas
 
+from pagerank import pagerank
 from pagerank2 import powerIteration
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -52,7 +53,7 @@ if __name__ == '__main__':
         n = len(tweet_ids)
 
         print('Processing tweets...done. %d found' % n)
-        graph = pandas.DataFrame(index=tweet_ids, columns=tweet_ids, dtype=int)
+        graph = pandas.DataFrame(index=tweet_ids, columns=tweet_ids, dtype=int,)
 
         print('Building graph...')
         for tweet_id in tweet_ids:
@@ -65,5 +66,6 @@ if __name__ == '__main__':
 
         print('Running TweetRank...')
         rank = powerIteration(graph).sort_values(ascending=False)
+        # rank = pagerank(graph).sort_values(ascending=False)
         print('Running TweetRank...done')
         pprint(rank[:20])
