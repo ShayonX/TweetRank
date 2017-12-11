@@ -4,8 +4,9 @@ import json
 import os
 from pprint import pprint
 
-import plotly.plotly as py
 import plotly
+import plotly.plotly as py
+
 plotly.tools.set_credentials_file(username='ShayonX', api_key='L85vuTaKTSO6fgpD2NLe')
 from plotly.graph_objs import *
 
@@ -14,7 +15,6 @@ import networkx as nx
 import pandas
 
 from pagerank import pagerank
-from pagerank2 import powerIteration
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RESULTS_DIR = os.path.join(BASE_DIR, 'results')
@@ -60,7 +60,7 @@ if __name__ == '__main__':
         n = len(tweet_ids)
 
         print('Processing tweets...done. %d found' % n)
-        graph = pandas.DataFrame(index=tweet_ids, columns=tweet_ids, dtype=int,)
+        graph = pandas.DataFrame(index=tweet_ids, columns=tweet_ids, dtype=int, )
 
         print('Building graph...')
         for tweet_id in tweet_ids:
@@ -72,12 +72,13 @@ if __name__ == '__main__':
         print('Building graph...done')
 
         print('Running TweetRank...')
-        rank = powerIteration(graph).sort_values(ascending=False)
-        # rank = pagerank(graph).sort_values(ascending=False)
+        # rank = powerIteration(graph).sort_values(ascending=False)
+        rank = pagerank(graph).sort_values(ascending=False)
         print('Running TweetRank...done')
-        pprint(rank[:20])
+        pprint(rank[:10])
+        rank.to_csv('ranking.csv')
 
-        #=--------------------------------------------------------------------------------
+        # =--------------------------------------------------------------------------------
         # Converting panda DataFrame n to numpy array
         graphArray = graph.as_matrix(columns=None)
 
@@ -85,14 +86,15 @@ if __name__ == '__main__':
 
         # count = 0
         # print('Starting scan for adjacent edges...')
-        # for i in  range(0,graphArray.shape[0]):
-        #     for j in range(0,graphArray.shape[1]):
+        # for i in range(0, graphArray.shape[0]):
+        #     for j in range(0, graphArray.shape[1]):
         #         if (graphArray[i][j] == 1):
-        #             print('from tweet %s to %s' % (tweet_ids[i],tweet_ids[j]))
+        #             print('from tweet %s to %s' % (tweet_ids[i], tweet_ids[j]))
+        #             print(rank[tweet_ids[j]])
         #             count += 1
-        # print ('Number of edges = ', (count))
+        # print('Number of edges = ', (count))
 
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
         # Getting node positions
 
