@@ -23,7 +23,7 @@ def pagerank(df, maxerr=0.0001, d=0.85, max_iterations=100):
                 assert df[t_id][key]==1.0
                 edges +=1
 
-            rank[key] = (d * val) + ((1.0 - d) / n)
+            rank[key] = float((d * val) + ((1.0 - d) / n))
         err = numpy.sum(numpy.abs(rank - ro))
         print("Error: %f" % err)
         print("Edges iterated: %d" % edges)

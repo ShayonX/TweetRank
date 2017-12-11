@@ -2,11 +2,11 @@ from __future__ import print_function
 
 import json
 import os
+import numpy as np
 from pprint import pprint
 
 import plotly
-import plotly.plotly as py
-
+import matplotlib.pyplot as plt
 plotly.tools.set_credentials_file(username='ShayonX', api_key='L85vuTaKTSO6fgpD2NLe')
 from plotly.graph_objs import *
 
@@ -73,7 +73,9 @@ if __name__ == '__main__':
 
         print('Running TweetRank...')
         # rank = powerIteration(graph).sort_values(ascending=False)
-        rank = pagerank(graph).sort_values(ascending=False)
+        rlabel = pagerank(graph)
+        rank = rlabel.sort_values(ascending=False)
+
         print('Running TweetRank...done')
         pprint(rank[:10])
         rank.to_csv('ranking.csv')
@@ -81,9 +83,9 @@ if __name__ == '__main__':
         # =--------------------------------------------------------------------------------
         # Converting panda DataFrame n to numpy array
         graphArray = graph.as_matrix(columns=None)
-
-        # Printing number of connecting edges and the tweets that are connected by this edge
-
+        print(graphArray)
+        # # Printing number of connecting edges and the tweets that are connected by this edge
+        #
         # count = 0
         # print('Starting scan for adjacent edges...')
         # for i in range(0, graphArray.shape[0]):
@@ -96,88 +98,105 @@ if __name__ == '__main__':
 
         # --------------------------------------------------------------------------------
 
+        # Creating Network Graph from adjacency matrix
+        rows, cols = np.where(graphArray == 1)
+        edges = zip(rows.tolist(), cols.tolist())
+        G = nx.DiGraph()
+        pos = nx.spring_layout(G)
+        G.add_edges_from(edges)
+        # labels = {}
+        # for i in range(0,len(tweet_ids)):
+        #     labels[i]=tweet_ids[i]
+        # nx.draw_networkx_labels(G,font_size=7)
+        # mylabels = {k: v for k, v in enumerate(tweet_ids)}
+        mylabels = dict(enumerate(rlabel))
+        for i in range (0,4196):
+            print('Key is %s and Rank is %s.' %(i,mylabels[i]))
+        nx.draw_random(G, node_size=200, with_labels=True)
+        plt.show()
+
+
         # Getting node positions
 
-        G = nx.random_geometric_graph(200, 0.125)
-
-        pos = nx.get_node_attributes(G, 'pos')
-
-        dmin = 1
-        ncenter = 0
-        for n in pos:
-            x, y = pos[n]
-            d = (x - 0.5) ** 2 + (y - 0.5) ** 2
-            if d < dmin:
-                ncenter = n
-                dmin = d
-
-        p = nx.single_source_shortest_path_length(G, ncenter)
-
-        # Creating Edges
-
-        edge_trace = Scatter(
-            x=[],
-            y=[],
-            line=Line(width=0.5, color='#888'),
-            hoverinfo='none',
-            mode='lines')
-
-        for edge in G.edges():
-            x0, y0 = G.node[edge[0]]['pos']
-            x1, y1 = G.node[edge[1]]['pos']
-            edge_trace['x'] += [x0, x1, None]
-            edge_trace['y'] += [y0, y1, None]
-
-        node_trace = Scatter(
-            x=[],
-            y=[],
-            text=[],
-            mode='markers',
-            hoverinfo='text',
-            marker=Marker(
-                showscale=True,
-                # colorscale options
-                # 'Greys' | 'Greens' | 'Bluered' | 'Hot' | 'Picnic' | 'Portland' |
-                # Jet' | 'RdBu' | 'Blackbody' | 'Earth' | 'Electric' | 'YIOrRd' | 'YIGnBu'
-                colorscale='YIGnBu',
-                reversescale=True,
-                color=[],
-                size=10,
-                colorbar=dict(
-                    thickness=15,
-                    title='Node Connections',
-                    xanchor='left',
-                    titleside='right'
-                ),
-                line=dict(width=2)))
-
-        for node in G.nodes():
-            x, y = G.node[node]['pos']
-            node_trace['x'].append(x)
-            node_trace['y'].append(y)
-
-        # Coloring node points
-
-        for node, adjacencies in enumerate(G.adjacency_list()):
-            node_trace['marker']['color'].append(len(adjacencies))
-            node_info = '# of connections: ' + str(len(adjacencies))
-            node_trace['text'].append(node_info)
-
-        # Creating Network Graph
-
-        fig = Figure(data=Data([edge_trace, node_trace]),
-                     layout=Layout(
-                         title='<br>Network graph made with Python',
-                         titlefont=dict(size=16),
-                         showlegend=False,
-                         hovermode='closest',
-                         margin=dict(b=20, l=5, r=5, t=40),
-                         annotations=[dict(
-                             text="Python code: <a href='https://plot.ly/ipython-notebooks/network-graphs/'> https://plot.ly/ipython-notebooks/network-graphs/</a>",
-                             showarrow=False,
-                             xref="paper", yref="paper",
-                             x=0.005, y=-0.002)],
-                         xaxis=XAxis(showgrid=False, zeroline=False, showticklabels=False),
-                         yaxis=YAxis(showgrid=False, zeroline=False, showticklabels=False)))
-
-        py.plot(fig)
+        # G = nx.random_geometric_graph(200, 0.125)
+        # pos = nx.get_node_attributes(G, 'pos')
+        #
+        # dmin = 1
+        # ncenter = 0
+        # for n in pos:
+        #     x, y = pos[n]
+        #     d = (x - 0.5) ** 2 + (y - 0.5) ** 2
+        #     if d < dmin:
+        #         ncenter = n
+        #         dmin = d
+        #
+        # p = nx.single_source_shortest_path_length(G, ncenter)
+        #
+        # # Creating Edges
+        #
+        # edge_trace = Scatter(
+        #     x=[],
+        #     y=[],
+        #     line=Line(width=0.5, color='#888'),
+        #     hoverinfo='none',
+        #     mode='lines')
+        #
+        # for edge in G.edges():
+        #     x0, y0 = G.node[edge[0]]['pos']
+        #     x1, y1 = G.node[edge[1]]['pos']
+        #     edge_trace['x'] += [x0, x1, None]
+        #     edge_trace['y'] += [y0, y1, None]
+        #
+        # node_trace = Scatter(
+        #     x=[],
+        #     y=[],
+        #     text=[],
+        #     mode='markers',
+        #     hoverinfo='text',
+        #     marker=Marker(
+        #         showscale=True,
+        #         # colorscale options
+        #         # 'Greys' | 'Greens' | 'Bluered' | 'Hot' | 'Picnic' | 'Portland' |
+        #         # Jet' | 'RdBu' | 'Blackbody' | 'Earth' | 'Electric' | 'YIOrRd' | 'YIGnBu'
+        #         colorscale='YIGnBu',
+        #         reversescale=True,
+        #         color=[],
+        #         size=10,
+        #         colorbar=dict(
+        #             thickness=15,
+        #             title='Node Connections',
+        #             xanchor='left',
+        #             titleside='right'
+        #         ),
+        #         line=dict(width=2)))
+        #
+        # for node in G.nodes():
+        #     x, y = G.node[node]['pos']
+        #     node_trace['x'].append(x)
+        #     node_trace['y'].append(y)
+        #
+        # # Coloring node points
+        #
+        # for node, adjacencies in enumerate(G.adjacency_list()):
+        #     node_trace['marker']['color'].append(len(adjacencies))
+        #     node_info = '# of connections: ' + str(len(adjacencies))
+        #     node_trace['text'].append(node_info)
+        #
+        # # Creating Network Graph
+        #
+        # fig = Figure(data=Data([edge_trace, node_trace]),
+        #              layout=Layout(
+        #                  title='<br>Network graph made with Python',
+        #                  titlefont=dict(size=16),
+        #                  showlegend=False,
+        #                  hovermode='closest',
+        #                  margin=dict(b=20, l=5, r=5, t=40),
+        #                  annotations=[dict(
+        #                      text="Python code: <a href='https://plot.ly/ipython-notebooks/network-graphs/'> https://plot.ly/ipython-notebooks/network-graphs/</a>",
+        #                      showarrow=False,
+        #                      xref="paper", yref="paper",
+        #                      x=0.005, y=-0.002)],
+        #                  xaxis=XAxis(showgrid=False, zeroline=False, showticklabels=False),
+        #                  yaxis=YAxis(showgrid=False, zeroline=False, showticklabels=False)))
+        #
+        # py.plot(fig)
